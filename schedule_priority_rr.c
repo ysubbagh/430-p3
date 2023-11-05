@@ -26,7 +26,7 @@ void add(char *name, int priority, int burst){
 }
 
 //lexographically pick tasks
-bool comesBefore(char *a, char *b){ return strcmp(a, b) < 0; }
+bool comesBefore(char *a, char *b){ return strcmp(a, b) > 0; }
 
 //get highest priority job
 bool isImportant(int a, int b){ return (a > b); }
