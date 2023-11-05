@@ -61,11 +61,10 @@ Task *pickNextTask(){
     if(!list){return NULL;}
 
     Task *thisTurn = list -> task;
-    Task *nextTurn = list -> next -> task;
 
     if(list -> next == NULL || thisTurn -> burst <= QUANTUM ){
         list = queue;
-    }else if(nextTurn -> priority != thisTurn -> priority){
+    }else if(list -> next -> task -> priority != thisTurn -> priority){
         list = queue;
     }else{
         list = list -> next;
