@@ -58,18 +58,19 @@ Task *makeRunQueue(){
 
 //pick the shortest task in the set, like FCFS
 Task *pickNextTask(){
+    if(!list){return NULL;}
+
     Task *thisTurn = list -> task;
     Task *nextTurn = list -> next -> task;
-    //setup next round
-    if(list -> next != NULL){
-        if(nextTurn -> priority != thisTurn -> priority){
-            return thisTurn;
-        }else{
-            list = list -> next;
-        }
-    }else{
+
+    if(list -> next == NULL || thisTurn -> burst <= QUANTUM ){
         list = queue;
+    }else if(nextTurn -> priority != thisTurn -> priority){
+        list = queue;
+    }else{
+        list = list -> next;
     }
+
     return thisTurn; //basecase
 } 
 
@@ -77,7 +78,8 @@ Task *pickNextTask(){
 void schedule(){
     //setup the run queue for round robin, based on FCFS
     while(list != NULL){
-        insert(&queue, makeRunQueue());
+        Task *copy = makeRunQueue();
+        insert(&queue, copy);
     }
     list = queue;
 
