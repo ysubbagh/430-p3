@@ -34,7 +34,7 @@ void add(char *name, int priority, int burst){
 bool comesBefore(char *a, char *b){ return strcmp(a, b) < 0; }
 
 //get highest priority job
-bool isImportant(int a, int b){ return (a < b); }
+bool isImportant(int a, int b){ return (a > b); }
 
 //help organization for printing, but maintain correctness
 bool isEqual(int a, int b) { return (a == b); }
