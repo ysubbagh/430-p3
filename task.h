@@ -11,6 +11,12 @@ typedef struct task {
     int tid;
     int priority;
     int burst;
+    //metrics for scheudler
+    int wait;
+    int response;
+    int tat;
+    int last; //only used with round robin schedulers
+    //-1 = base case, check for errors
 } Task;
 
 #endif
