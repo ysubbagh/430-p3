@@ -13,10 +13,9 @@ typedef struct task {
     int burst;
     //metrics for scheudler
     int wait;
-    int response;
+    int response; //-1 = base case, check for errors
     int tat;
     int last; //only used with round robin schedulers
-    //-1 = base case, check for errors
 } Task;
 
 #endif

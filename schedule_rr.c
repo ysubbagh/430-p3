@@ -27,7 +27,7 @@ void add(char *name, int priority, int burst){
     newTask -> wait = 0;
     newTask -> response = -1;
     newTask -> tat = 0;
-    newTask -> last = -1;
+    newTask -> last = 0;
 
     //add to back of list
     insert(&list, newTask);
@@ -69,7 +69,6 @@ Task *pickNextTask(){
 
 //apend the tasks metric to the global string to be printed once all tasks are completed runnning 
 void appendMetric(Task *thisTask){
-    thisTask -> wait --; //account for dispatch intialization preset
     char addLine[50];
     sprintf(addLine, " %s| %d | %d | %d|\n", thisTask -> name, thisTask -> tat, thisTask -> wait, thisTask -> response);
     strcat(metrics, addLine);
