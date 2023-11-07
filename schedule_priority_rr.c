@@ -56,7 +56,7 @@ Task *makeRunQueue(){
     return bestSoFar;
 } 
 
-//pick the shortest task in the set, like FCFS
+//move through the queue to round robin, if next item is different priority, go back
 Task *pickNextTask(){
     if(!list){return NULL;}
 
@@ -75,7 +75,7 @@ Task *pickNextTask(){
 
 //schedule the exectuion
 void schedule(){
-    //setup the run queue for round robin, based on FCFS
+    //setup the run queue for round robin, based on priority
     while(list != NULL){
         Task *copy = makeRunQueue();
         insert(&queue, copy);

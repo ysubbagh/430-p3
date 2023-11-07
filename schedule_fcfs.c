@@ -47,9 +47,21 @@ Task *pickNextTask(){
 
 //schedule the exectuion
 void schedule(){
+    //setup for CPU utilization
+    double tTime = 0;
+    double nDispatch = -1;
+
+    //scheudler run queue 
     while(list != NULL){
         Task *toRun = pickNextTask();
         run(toRun, toRun -> burst);
+        //increment values for cpu utilization
+        nDispatch++; //assuming the dispatcher takes 1 unit of time
+        tTime += toRun -> burst;
         delete(&list, toRun);
     }
+
+    //CPU Utilization time
+    double cpuUtil = 100 * (tTime / (tTime + nDispatch));
+    printf("CPU Utilization: %.2f%%\n", cpuUtil);
 }
