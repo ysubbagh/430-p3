@@ -11,6 +11,8 @@
 
 //list storage
 struct node *list = NULL;
+//metric storage (it is bigger than it needs to be, just being safe)
+char metrics[1000] = "...|TAT| WT| RT|\n";
 
 void add(char *name, int priority, int burst){
     Task *newTask = malloc(sizeof(Task));
@@ -19,6 +21,10 @@ void add(char *name, int priority, int burst){
     newTask -> name = name;
     newTask -> priority = priority;
     newTask -> burst = burst;
+    //setup metrics
+    newTask -> wait = 0;
+    newTask -> response = -1;
+    newTask -> tat = 0;
 
     //add to back of list
     insert(&list, newTask);
@@ -53,6 +59,13 @@ Task *pickNextTask(){
     return bestSoFar;
 } 
 
+//apend the tasks metric to the global string to be printed once all tasks are completed runnning 
+void appendMetric(Task *thisTask){
+    char addLine[50];
+    sprintf(addLine, " %s| %d | %d | %d|\n", thisTask -> name, thisTask -> tat, thisTask -> wait, thisTask -> response);
+    strcat(metrics, addLine);
+}
+
 //schedule the exectuion
 void schedule(){
     //setup for CPU utilization
@@ -62,14 +75,26 @@ void schedule(){
     // scheduler run queue
     while(list != NULL){
         Task *toRun = pickNextTask();
+
+        //add task metrics for wait time and response time 
+        if(toRun -> response < 0){toRun -> response = tTime;}
+        toRun -> wait = tTime;
+
         run(toRun, toRun -> burst);
         //increment values for cpu utilization
         nDispatch++; //assuming the dispatcher takes 1 unit of time
         tTime += toRun -> burst;
+
+        //add metrics to print string before deleting from list
+        toRun -> tat = tTime;
+        appendMetric(toRun);
         delete(&list, toRun);
     }
 
     //CPU Utilization time
     double cpuUtil = 100 * (tTime / (tTime + nDispatch));
     printf("CPU Utilization: %.2f%%\n", cpuUtil);
+
+    //print metrics
+    printf("%s\n", metrics);
 }
