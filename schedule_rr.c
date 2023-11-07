@@ -13,6 +13,9 @@
 struct node *list = NULL;
 struct node *queue = NULL;
 
+//metric storage (it is bigger than it needs to be, just being safe)
+char metrics[1000] = "...|TAT| WT| RT|\n";
+
 void add(char *name, int priority, int burst){
     Task *newTask = malloc(sizeof(Task));
 
@@ -20,6 +23,11 @@ void add(char *name, int priority, int burst){
     newTask -> name = name;
     newTask -> priority = priority;
     newTask -> burst = burst;
+    //setup metrics
+    newTask -> wait = 0;
+    newTask -> response = -1;
+    newTask -> tat = 0;
+    newTask -> last = -1;
 
     //add to back of list
     insert(&list, newTask);
@@ -59,6 +67,14 @@ Task *pickNextTask(){
     return thisTurn;
 } 
 
+//apend the tasks metric to the global string to be printed once all tasks are completed runnning 
+void appendMetric(Task *thisTask){
+    thisTask -> wait --; //account for dispatch intialization preset
+    char addLine[50];
+    sprintf(addLine, " %s| %d | %d | %d|\n", thisTask -> name, thisTask -> tat, thisTask -> wait, thisTask -> response);
+    strcat(metrics, addLine);
+}
+
 //schedule the exectuion
 void schedule(){
     //setup the run queue for round robin, based on FCFS
@@ -74,6 +90,11 @@ void schedule(){
     //round robin run queue
     while(queue != NULL){
         Task *temp = pickNextTask();
+        //for metrics table
+        if(temp -> response < 0){temp -> response = tTime;}
+        temp -> wait += tTime - temp -> last;
+
+        //run quantum or less
         if(temp -> burst > QUANTUM){
             tTime += QUANTUM;
             run(temp, QUANTUM);
@@ -81,12 +102,19 @@ void schedule(){
         }else if (temp -> burst <= QUANTUM){
             tTime += temp -> burst;
             run(temp, temp -> burst);
+            //update metrics before deleting from list
+            temp -> tat = tTime;
+            appendMetric(temp);
             delete(&queue, temp);
         }
         nDispatch++;
+        temp -> last = tTime;
     }
 
      //CPU Utilization time
     double cpuUtil = 100 * (tTime / (tTime + nDispatch));
     printf("CPU Utilization: %.2f%%\n", cpuUtil);
+
+    //print metrics
+    printf("%s\n", metrics);
 }
