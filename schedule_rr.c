@@ -67,15 +67,26 @@ void schedule(){
     }
     list = queue;
 
+    //setup for CPU utilization
+    double tTime = 0;
+    double nDispatch = -1;
+
     //round robin run queue
     while(queue != NULL){
         Task *temp = pickNextTask();
         if(temp -> burst > QUANTUM){
+            tTime += QUANTUM;
             run(temp, QUANTUM);
             temp -> burst -= QUANTUM;
         }else if (temp -> burst <= QUANTUM){
+            tTime += temp -> burst;
             run(temp, temp -> burst);
             delete(&queue, temp);
         }
+        nDispatch++;
     }
+
+     //CPU Utilization time
+    double cpuUtil = 100 * (tTime / (tTime + nDispatch));
+    printf("CPU Utilization: %.2f%%\n", cpuUtil);
 }
